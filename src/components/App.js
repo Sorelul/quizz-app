@@ -7,6 +7,7 @@ import StartScreen from "./StartScreen";
 import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
+import FinishScreen from "./FinishScreen";
 
 const initialState = {
     questions: [],
@@ -38,7 +39,6 @@ function reducer(state, action) {
         case "newAnswer":
             const question = state.questions.at(state.index);
             const isCorrect = action.payload === question.correctOption;
-            console.log(isCorrect);
 
             return {
                 ...state,
@@ -46,11 +46,21 @@ function reducer(state, action) {
                 points: isCorrect ? state.points + question.points : state.points,
             };
         case "nextQuestion":
-            return {
-                ...state,
-                index: state.index + 1,
-                answer: null,
-            };
+            const nextQuestion = state.index + 1;
+            const totalQuestions = state.questions.length;
+
+            if (nextQuestion >= totalQuestions) {
+                return {
+                    ...state,
+                    status: "finished",
+                };
+            } else {
+                return {
+                    ...state,
+                    index: nextQuestion,
+                    answer: null,
+                };
+            }
         default:
             return new Error("Invalid action type");
     }
@@ -86,9 +96,11 @@ export default function App() {
                             answer={answer}
                         />
                         <Question question={questions.at(index)} dispatch={dispatch} answer={answer} />
-                        <NextButton dispatch={dispatch} answer={answer} />
+                        <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
                     </>
                 )}
+
+                {status === "finished" && <FinishScreen points={points} maxPossiblePoints={maxPossiblePoints} />}
             </Main>
         </div>
     );
