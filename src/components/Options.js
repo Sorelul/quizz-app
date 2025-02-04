@@ -1,10 +1,19 @@
-import Option from "./Option";
+function Options({ question, dispatch, answer }) {
+    const hasAnswer = answer !== null;
 
-function Options({ question }) {
     return (
         <div className="options">
             {question.options.map((option, index) => (
-                <Option key={index} option={option} />
+                <button
+                    key={option}
+                    onClick={() => dispatch({ type: "newAnswer", payload: index })}
+                    disabled={hasAnswer}
+                    className={`btn btn-option ${index === answer ? "answer" : ""} ${
+                        hasAnswer ? (index === question.correctOption ? "correct" : "wrong") : ""
+                    }`}
+                >
+                    {option}
+                </button>
             ))}
         </div>
     );

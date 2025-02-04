@@ -5,12 +5,15 @@ import Loader from "./Loader";
 import Error from "./Error";
 import StartScreen from "./StartScreen";
 import Question from "./Question";
+import NextButton from "./NextButton";
 
 const initialState = {
     questions: [],
     // 'loading' , 'error', 'ready', 'active', 'finished'
     status: "loading",
     index: 0,
+    answer: null,
+    points: 0,
 };
 
 function reducer(state, action) {
@@ -31,13 +34,29 @@ function reducer(state, action) {
                 ...state,
                 status: "active",
             };
+        case "newAnswer":
+            const question = state.questions.at(state.index);
+            const isCorrect = action.payload === question.correctOption;
+            console.log(isCorrect);
+
+            return {
+                ...state,
+                answer: action.payload,
+                points: isCorrect ? state.points + question.points : state.points,
+            };
+        case "nextQuestion":
+            return {
+                ...state,
+                index: state.index + 1,
+                answer: null,
+            };
         default:
             return new Error("Invalid action type");
     }
 }
 
 export default function App() {
-    const [{ questions, status, index }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, index, answer }, dispatch] = useReducer(reducer, initialState);
 
     const numQuestions = questions.length;
 
@@ -55,7 +74,12 @@ export default function App() {
                 {status === "loading" && <Loader />}
                 {status === "error" && <Error />}
                 {status === "ready" && <StartScreen numQuestions={numQuestions} dispatch={dispatch} />}
-                {status === "active" && <Question question={questions.at(index)} />}
+                {status === "active" && (
+                    <>
+                        <Question question={questions.at(index)} dispatch={dispatch} answer={answer} />
+                        <NextButton dispatch={dispatch} answer={answer} />
+                    </>
+                )}
             </Main>
         </div>
     );
