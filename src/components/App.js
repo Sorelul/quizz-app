@@ -63,6 +63,13 @@ function reducer(state, action) {
                     answer: null,
                 };
             }
+        case "restart":
+            return {
+                ...initialState,
+                questions: state.questions,
+                status: "ready",
+                highscore: state.highscore,
+            };
         default:
             return new Error("Invalid action type");
     }
@@ -103,7 +110,12 @@ export default function App() {
                 )}
 
                 {status === "finished" && (
-                    <FinishScreen points={points} maxPossiblePoints={maxPossiblePoints} highscore={highscore} />
+                    <FinishScreen
+                        points={points}
+                        maxPossiblePoints={maxPossiblePoints}
+                        highscore={highscore}
+                        dispatch={dispatch}
+                    />
                 )}
             </Main>
         </div>
