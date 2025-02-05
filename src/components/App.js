@@ -8,6 +8,8 @@ import Question from "./Question";
 import NextButton from "./NextButton";
 import Progress from "./Progress";
 import FinishScreen from "./FinishScreen";
+import Timer from "./Timer";
+import Footer from "./Footer";
 
 const initialState = {
     questions: [],
@@ -17,6 +19,7 @@ const initialState = {
     answer: null,
     points: 0,
     highscore: 0,
+    secondsRemaining: 60,
 };
 
 function reducer(state, action) {
@@ -70,13 +73,24 @@ function reducer(state, action) {
                 status: "ready",
                 highscore: state.highscore,
             };
+        case "tick":
+            const remaining_time = state.secondsRemaining - 1;
+
+            return {
+                ...state,
+                secondsRemaining: remaining_time,
+                status: remaining_time === 0 ? "finished" : state.status,
+            };
         default:
             return new Error("Invalid action type");
     }
 }
 
 export default function App() {
-    const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(reducer, initialState);
+    const [{ questions, status, index, answer, points, highscore, secondsRemaining }, dispatch] = useReducer(
+        reducer,
+        initialState
+    );
 
     const numQuestions = questions.length;
     const maxPossiblePoints = questions.reduce((prev, cur) => prev + cur.points, 0);
@@ -105,7 +119,10 @@ export default function App() {
                             answer={answer}
                         />
                         <Question question={questions.at(index)} dispatch={dispatch} answer={answer} />
-                        <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
+                        <Footer>
+                            <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+                            <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
+                        </Footer>
                     </>
                 )}
 
