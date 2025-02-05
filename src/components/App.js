@@ -96,12 +96,12 @@ export default function App() {
     );
 
     const numQuestions = questions.length;
-    const maxPossiblePoints = questions.reduce((prev, cur) => prev + cur.points, 0);
+    const maxPossiblePoints = questions.length > 0 ? questions.reduce((prev, cur) => prev + cur.points, 0) : 0;
 
     useEffect(() => {
-        fetch("http://localhost:8000/questions")
+        fetch("https://sorelul.github.io/json-api/questions.json")
             .then((res) => res.json())
-            .then((data) => dispatch({ type: "dataReceived", payload: data }))
+            .then((data) => dispatch({ type: "dataReceived", payload: data.questions }))
             .catch((err) => dispatch({ type: "datafailed" }));
     }, []);
 
